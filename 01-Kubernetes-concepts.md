@@ -27,19 +27,12 @@
 ## Other things that Kubernetes can do for us
 
 - Basic autoscaling
-
 - Blue/green deployment, canary deployment
-
 - Long running services, but also batch (one-off) jobs
-
 - Overcommit our cluster and *evict* low-priority jobs
-
 - Run services with *stateful* data (databases etc.)
-
 - Fine-grained access control defining *what* can be done by *whom* on *which* resources
-
 - Integrating third party services (*service catalog*)
-
 - Automating complex tasks (*operators*)
 
 ---
@@ -70,15 +63,15 @@
 
 - The Kubernetes logic (its "brains") is a collection of services:
 
-  - the API server (our point of entry to everything!)
+  - the **API server** (our point of entry to everything!)
 
-  - core services like the scheduler and controller manager
+  - core services like the **scheduler** and **controller manager**
 
-  - `etcd` (a highly available key/value store; the "database" of Kubernetes)
+  - **etcd** (a highly available key/value store; the "database" of Kubernetes)
 
 - Together, these services form the control plane of our cluster
 
-- The control plane is also called the "master"
+- The control plane is also called the **"master"**
 
 ---
 
@@ -89,22 +82,14 @@
 ## Running the control plane on special nodes
 
 - It is common to reserve a dedicated node for the control plane
-
   (Except for single-node development clusters, like when using minikube)
-
 - This node is then called a "master"
-
   (Yes, this is ambiguous: is the "master" a node, or the whole control plane?)
-
 - Normal applications are restricted from running on this node
-
   (By using a mechanism called ["taints"](https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/))
-
 - When high availability is required, each service of the control plane must be resilient
-
 - The control plane is then replicated on multiple nodes
-
-  (This is sometimes called a "multi-master" setup)
+  (This is sometimes called a **"multi-master"** setup)
 
 ---
 
@@ -114,8 +99,6 @@
 
 - For instance: since `etcd` is a critical service, some people
   deploy it directly on a dedicated cluster (without containers)
-
-  (This is illustrated on the first "super complicated" schema)
 
 - In some hosted Kubernetes offerings (e.g. AKS, GKE, EKS), the control plane is invisible
 
@@ -129,7 +112,7 @@
 
 ## Do we need to run Docker at all?
 
-No... But Yes!
+**No... But for the moment Yes!**
 
 - By default, Kubernetes uses the Docker Engine to run containers
 
@@ -137,17 +120,14 @@ No... But Yes!
 
 - Or leverage other pluggable runtimes through the *Container Runtime Interface*
 
-  (like CRI-O, or containerd)
+  (like **CRI-O**, or **containerd**)
 
 - On our development environments, CI pipelines ... :
-
-  *Yes, almost certainly*
+*Yes, almost certainly*
 
 - On our production servers:
-
-  *Yes (today)*
-
-  *Probably not (in the future)*
+*Yes (today)*
+*Probably not (in the future)*
 
 ---
 
@@ -185,20 +165,25 @@ No... But Yes!
 
 Our container orchestrator puts a very strong emphasis on being declarative
 
---
+### Declarative : 
+<!-- .element: class="fragment" data-fragment-index="1"-->
+I would like a cup of tea.
+<!-- .element: class="fragment" data-fragment-index="1"-->
 
-**Declarative :**  I would like a cup of tea.
-
---
-
-**Imperative :**
+### Imperative :
+<!-- .element: class="fragment" data-fragment-index="2"-->
 Boil some water. Pour it in a teapot. Add tea leaves. Steep for a while. Serve in a cup.
-Declarative seems simpler at first ...
-... As long as you know how to brew tea
+<!-- .element: class="fragment" data-fragment-index="2"-->
 
---
+---
 
-**What declarative would really be :**
-I want a cup of tea, obtained by pouring an infusion¹ of tea leaves in a cup.
+**Declarative seems simpler at first ...**
+**As long as you know how to brew tea**
+<!-- .element: class="fragment" data-fragment-index="1"-->
+
+### What declarative would really be :
+<!-- .element: class="fragment" data-fragment-index="2"-->
+I want a cup of tea, obtained by pouring an infusion of tea leaves in a cup.
 An infusion is obtained by letting the object steep a few minutes in hot water.
 Hot liquid is obtained by pouring it in an appropriate container and setting it on a stove.
+<!-- .element: class="fragment" data-fragment-index="2"-->

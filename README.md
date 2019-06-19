@@ -1,9 +1,5 @@
-
-https://github.com/sinedied/backslide
-```
-bs serve
-```
-http://localhost:4100
+reveal-md 01-Kubernetes-concepts.md --theme white --css css/custom.css
+reveal-md 02-Kubernetes-objects.md --theme white --css css/custom.css
 
 ## Credits
 

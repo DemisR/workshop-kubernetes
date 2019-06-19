@@ -1,7 +1,3 @@
----
-marp : true
----
-
 # Base objects
 - Pod
 - Service
@@ -21,8 +17,6 @@ A pod can contain single container as well.
 But when it contains multiple containers, all of the containers are running on single worker node.
 A pod won’t distribute across multiple worker nodes.
 
---
-
 ```yaml
 apiVersion: v1
 kind: Pod
@@ -36,6 +30,7 @@ spec:
     image: busybox
     command: ['sh', '-c', 'echo Hello Kubernetes! && sleep 3600']
 ```
+<!-- .element: class="fragment" -->
 
 ---
 
@@ -43,8 +38,6 @@ spec:
 **Logical set of Pods**
 
 An abstract way to expose an application running on a set of Pods as a network service.
-
---
 
 ```yaml
 apiVersion: v1
@@ -59,7 +52,9 @@ spec:
     protocol: TCP
   selector:
     run: my-nginx
-```
+``` 
+<!-- .element: class="fragment" -->
+
 ---
 
 ## Volume
@@ -68,19 +63,20 @@ In Docker, a volume is simply a directory on disk or in another Container. Lifet
 A Kubernetes volume, has an explicit lifetime (the same as the Pod that encloses it).
 Data is preserved across Container restarts.
 
---
 
 ## PersistentVolume and PersistentVolumeClaim
+<!-- .element: class="fragment" -->
 
 | Type of storage | How long does it last?  |
 | ------------- | -----|
 | Container filesystem | Container lifetime |
 | Volume (k8s) | Pod lifetime |
 | Persistent volume | Cluster lifetime |
+<!-- .element: class="fragment" -->
 
---
+Some types of Volumes: awsElasticBlockStore, iscsi, local, nfs, glusterfs, ... 
+<!-- .element: class="fragment" -->
 
-Some types of Volumes: awsElasticBlockStore, iscsi, local, nfs, glusterfs, ...
 ---
 
 ## Namespaces
@@ -116,8 +112,6 @@ This actually means that you may never need to manipulate ReplicaSet objects: **
 A Deployment controller provides **declarative** updates for **Pods** and **ReplicaSets**.
 You describe a **desired state** in a Deployment object, and the Deployment controller changes the actual state to the desired state at a controlled rate.
 
---
-
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -141,13 +135,17 @@ spec:
         ports:
         - containerPort: 80
 ```
+<!-- .element: class="fragment" -->
+
 ---
 
 ## DaemonSet
 A DaemonSet **ensures that all (or some) Nodes run a copy of a Pod**. 
 
-## StatefulSet
-StatefulSet is the workload API object used to **manage stateful applications**.
+## StatefulSet  
+<!-- .element: class="fragment" data-fragment-index="1"-->
+StatefulSet is the workload API object used to <!-- .element: class="fragment" data-fragment-index="1"--> **manage stateful applications**.
+<!-- .element: class="fragment" data-fragment-index="1"-->
 
 ---
 
