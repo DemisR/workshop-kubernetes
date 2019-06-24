@@ -63,19 +63,20 @@ In Docker, a volume is simply a directory on disk or in another Container. Lifet
 A Kubernetes volume, has an explicit lifetime (the same as the Pod that encloses it).
 Data is preserved across Container restarts.
 
+Some types of Volumes: awsElasticBlockStore, iscsi, local, nfs, glusterfs, ... 
+<!-- .element: class="fragment" -->
+
+---
 
 ## PersistentVolume and PersistentVolumeClaim
-<!-- .element: class="fragment" -->
+
+Abstracts details of how storage is provided from how it is consumed.
 
 | Type of storage | How long does it last?  |
 | ------------- | -----|
 | Container filesystem | Container lifetime |
 | Volume (k8s) | Pod lifetime |
 | Persistent volume | Cluster lifetime |
-<!-- .element: class="fragment" -->
-
-Some types of Volumes: awsElasticBlockStore, iscsi, local, nfs, glusterfs, ... 
-<!-- .element: class="fragment" -->
 
 ---
 
@@ -142,6 +143,8 @@ spec:
 ## DaemonSet
 A DaemonSet **ensures that all (or some) Nodes run a copy of a Pod**. 
 
+Usefull for monitoring hosts or collect logs for example.
+
 ## StatefulSet  
 <!-- .element: class="fragment" data-fragment-index="1"-->
 StatefulSet is the workload API object used to <!-- .element: class="fragment" data-fragment-index="1"--> **manage stateful applications**.
@@ -154,9 +157,3 @@ StatefulSet is the workload API object used to <!-- .element: class="fragment" d
 ---
 
 ![](images/module_04_services.svg)
-
----
-
-http://kubernetesbyexample.com/
-
-https://kubernetesbootcamp.github.io/kubernetes-bootcamp/index.html

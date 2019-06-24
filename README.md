@@ -12,3 +12,11 @@ reveal-md 02-Kubernetes-objects.md --theme white --css css/custom.css
 
 - `01-Kubernetes-concepts.md` of this workshop it's basicly a recaps of k8s slides by Jérôme Petazzoni (jpetazzo )
 https://qconuk2019.container.training
+
+
+### Other resources
+
+
+http://kubernetesbyexample.com/
+https://kubernetesbootcamp.github.io/kubernetes-bootcamp/index.html
+https://eksworkshop.com

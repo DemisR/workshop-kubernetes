@@ -1,68 +1,146 @@
-kubectl get nodes
+# The Kubernetes CLI : kubectl
+## Prepare your cli
 
+Install `kubectl`
+```
+brew install kubernetes-cli
+```
+Check version `kubectl version`
+
+---
+
+## Enable kubectl autocompletion
+**Bash on MacOS**
+You can test if you have bash-completion v2 already installed with `type _init_completion`. If not, you can install it with Homebrew:
+
+```
+brew install bash-completion@2
+```
+
+As stated in the output of this command, add the following to your `~/.bashrc` file:
+
+```
+export BASH_COMPLETION_COMPAT_DIR="/usr/local/etc/bash_completion.d"
+[[ -r "/usr/local/etc/profile.d/bash_completion.sh" ]] && . "/usr/local/etc/profile.d/bash_completion.sh"
+```
+
+Enable kubectl autocompletion
+
+```
+echo 'source <(kubectl completion bash)' >>~/.bashrc
+```
+
+---
+
+## Enable kubectl autocompletion
+**Zsh on MacOS**
+
+```
+echo 'source <(kubectl completion zsh)' >>~/.zshrc 
+```
+
+---
+
+## Workshop cluster
+
+The cluster for the workshop is a manager k8s on AWS ( EKS ).
+Created with the tool `eksctl`.
+
+---
+
+## Requirement for easy access to EKS cluster
+Install `awscli`
+```
+brew install aws-cli
+```
+
+Configure with your aws key
+```
+$ aws configure
+AWS Access Key ID [None]: AKIAIOSFODNN7EXAMPLE
+AWS Secret Access Key [None]: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+Default region name [None]: eu-west-3
+Default output format [None]: json
+```
+
+---
+
+## Configure your kubectl 
+
+We can update our kubectl config file to use the aws-cli for pulling IAM tokens with this command:
+
+```
+aws eks update-kubeconfig --name workshop-1 --region eu-west-3 # this updates kubeconfig to pull iam tokens using aws-cli
+```
+
+Check the accessibility to the cluster
+```
+kubectl get nodes
+kubectl get service 
+```
+
+---
+
+## Create your namespace
 
 Create a namespace with the following command:
+
+```
 kubectl create -f- <<EOF
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: hello
+  name: demis
 EOF
+```
 
-This is equivalent to kubectl create namespace hello.
+This is equivalent to `kubectl create namespace demis`.
 
 Read back our object:
-kubectl get namespace hello -o yaml
 
+```
+kubectl get namespace demis -o yaml
+```
 
-What's special about watch?
-The API server itself doesn't do anything: it's just a fancy object store
+Set you context namespace
+```
+kubectl config set-context --current --namespace=demis
+```
 
-All the actual logic in Kubernetes is implemented with controllers
+---
 
-A controller watches a set of resources, and takes action when they change
+## Base commannds
+```
+kubectl get namespaces 
+kubectl get pods  --all-namespaces 
+kubectl get service 
 
-Examples:
+kubectl describe pod <name>  
 
-when a Pod object is created, it gets scheduled and started
+kubectl cluster-info
+kubectl describe node <node>
+```
 
-when a Pod belonging to a ReplicaSet terminates, it gets replaced
+---
 
-when a Deployment object is updated, it can trigger a rolling update
+## Run a pod
 
+```
+kubectl run web --image=nginx --replicas=3 --namespace demis 
+kubectl get pods --namespace demis
+```
 
 https://kadm-2019-06.container.training/#53
 
+```
+kubectl get deployments  
+kubectl delete deployments web
+```
+
+---
 
 
 
-# EKS (the easy way)
-Install eksctl
-
-Set the usual environment variables
-
-(AWS_DEFAULT_REGION, AWS_ACCESS_KEY, AWS_SECRET_ACCESS_KEY)
-
-Create the cluster:
-
-eksctl create cluster
-Wait 15-20 minutes (yes, it's sloooooooooooooooooow)
-
-Add cluster add-ons
-
-(by default, it doesn't come with metrics-server, logging, etc.)
-Delete the cluster:
-
-eksctl delete cluster <clustername>
-If you need to find the name of the cluster:
-
-eksctl get clusters
 
 
-https://docs.aws.amazon.com/fr_fr/eks/latest/userguide/getting-started-eksctl.html
 
-# GKE https://kadm-2019-06.container.training/#210
-# AKS https://kadm-2019-06.container.training/#213
-
-
-w
