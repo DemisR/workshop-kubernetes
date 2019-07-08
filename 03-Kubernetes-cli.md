@@ -10,7 +10,8 @@ Check version `kubectl version`
 ---
 
 ## Enable kubectl autocompletion
-**Bash on MacOS**
+### Bash on MacOS
+
 You can test if you have bash-completion v2 already installed with `type _init_completion`. If not, you can install it with Homebrew:
 
 ```
@@ -33,7 +34,7 @@ echo 'source <(kubectl completion bash)' >>~/.bashrc
 ---
 
 ## Enable kubectl autocompletion
-**Zsh on MacOS**
+### Zsh on MacOS
 
 ```
 echo 'source <(kubectl completion zsh)' >>~/.zshrc 
@@ -44,6 +45,7 @@ echo 'source <(kubectl completion zsh)' >>~/.zshrc
 ## Workshop cluster
 
 The cluster for the workshop is a manager k8s on AWS ( EKS ).
+
 Created with the tool `eksctl`.
 
 ---

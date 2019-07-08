@@ -16,3 +16,11 @@
     max-width: 95%;
     max-height: 600px;
 }
+
+.reveal code {
+    color: #ef596f;
+}
+
+.reveal pre code {
+    color: #d8985f;
+}

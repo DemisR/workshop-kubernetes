@@ -1,4 +1,11 @@
-# Slides
+# Summary
+
+- Kubernetes conceps and architecture
+- Objects (Pods,Services,...)
+- Setup your cli and basics commands
+- Your first k8s deployment
+
+## Slides
 
 Require `reveal-md`
 
