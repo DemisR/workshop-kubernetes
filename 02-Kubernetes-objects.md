@@ -43,7 +43,7 @@ An abstract way to expose an application running on a set of Pods as a network s
 apiVersion: v1
 kind: Service
 metadata:
-  name: myapp-service
+   name: myapp-service
 spec:
   ports:
   - port: 80

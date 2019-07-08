@@ -6,7 +6,7 @@ metadata:
     traefik.frontend.rule.type: PathPrefixStrip
   creationTimestamp: null
   name: traefik-ingress
-  namespace: demis
+  namespace: <your name>
 spec:
   rules:
   - http:
@@ -14,6 +14,6 @@ spec:
       - backend:
           serviceName: podinfo
           servicePort: 9898
-        path: /demis
+        path: /<your name>
 status:
   loadBalancer: {}

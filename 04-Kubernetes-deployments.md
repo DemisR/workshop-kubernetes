@@ -3,7 +3,7 @@
 Edit files in `04-deployment` folder.
 Change namespace
 ```
-  namespace: demis
+  namespace: <your name>
 ```
 
 Deploy the app
@@ -29,7 +29,6 @@ kubectl get deployment podinfo
 # Find the service address
 
 Now that we have a running service that is `type: LoadBalancer` we need to find the ELB’s address.
-We can do this by using the get services operation of kubectl:
 
 ```
 kubectl get service podinfo -o wide
@@ -38,6 +37,7 @@ _(The `-o wide` it's only for change the output format)_
 
 
 If we wanted to use the data programatically, we can also output via json. This is an example of how we might be able to make use of json output:
+
 ```
 ELB=$(kubectl get service podinfo -o json | jq -r '.status.loadBalancer.ingress[].hostname')
 ```
@@ -53,11 +53,11 @@ curl -m3 -v $ELB:9898
 ```
 It will take several minutes for the ELB to become healthy and start passing traffic to the frontend pods.
 
+Try to access to the url on port `9898` with you browser.
+
+---
 
 ![](images/loadbalancer.png)
-
-
-Try to access to the url on port 9898 with you browser.
 
 ---
 
@@ -76,22 +76,30 @@ kubectl delete -f 04-deployment/deployment.yaml
 
 # Ingress
 
+Instead creating a load balancer for each service, you can use an Ingress to dispatch request on differents services.
 
-The line `type: LoadBalancer` on `04-deployment/service.yaml` it's not necessary. You can remove it.
+The line `type: LoadBalancer` on `04-deployment/service.yaml` it's not necessary.
 
+You can remove it and deploy the service.
 
 ```
 kubectl apply -f 04-deployment/service.yaml
 kubectl apply -f 04-deployment/deployment.yaml
 ```
 
-Change name of path in file `04-deployment/ingress.yaml` by your name
+---
+## Ingress by path
+
+Change name of path and namespace in file `04-deployment/ingress.yaml`
+and create the ingress
 
 ```
 kubectl apply -f 04-deployment/ingress.yaml
 ```
 
-Now try to access to `http://demo.k8sworkshop.exxoss.academy/<your name>`
+Now try to access to 
+
+`http://demo.k8sworkshop.exxoss.academy/<your name>`
 
 ---
 
@@ -99,24 +107,22 @@ Now try to access to `http://demo.k8sworkshop.exxoss.academy/<your name>`
 
 ---
 
+## Ingress : Host based access
 
 Edit `04-deployment/ingress.yaml` 
-Replace line
 ```
-        path: /<your name>
+-        path: /<your name>
 ```
-with 
 ```
-    host: <your name>.k8sworkshop.exxoss.academy
++   host: <your name>.k8sworkshop.exxoss.academy
 ```
 
 and
 ```
-    traefik.frontend.rule.type: PathPrefixStrip
+-   traefik.frontend.rule.type: PathPrefixStrip
 ```
-with 
 ```
-    traefik.frontend.rule.type: PathPrefix
++   traefik.frontend.rule.type: PathPrefix
 ```
 
 Apply the changes 
@@ -124,7 +130,9 @@ Apply the changes
 kubectl apply -f 04-deployment/ingress.yaml
 ```
 
-Now you can join you app directly with `http://<your name>.k8sworkshop.exxoss.academy`
+Now you can join you app directly with 
+
+`http://<your name>.k8sworkshop.exxoss.academy`
 
 You can use `kubectl logs -f -l app=podinfo` for follow logs.
 
@@ -147,5 +155,5 @@ kubectl scale deployment podinfo --replicas=3
 Confirm by looking at deployments again `kubectl get deployments`
 
 _A better option to scale your service is edit the `04-deployment/ingress.yaml` and apply it._
-
+<!-- .element: class="fragment" data-fragment-index="1"-->
 

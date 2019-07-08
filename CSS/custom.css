@@ -4,6 +4,9 @@
     margin-left: 10px;
 }
 
+.reveal h1{
+    font-size: 2em;
+}
 .reveal .slides {
     position: absolute;
     width: 100%;

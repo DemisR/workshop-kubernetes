@@ -57,7 +57,7 @@ brew install aws-cli
 ```
 
 Configure with your aws key
-```
+```shell
 $ aws configure
 AWS Access Key ID [None]: AKIAIOSFODNN7EXAMPLE
 AWS Secret Access Key [None]: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
@@ -87,32 +87,33 @@ kubectl get service
 
 Create a namespace with the following command:
 
-```
+```yaml
 kubectl create -f- <<EOF
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: demis
+  name: <your name>
 EOF
 ```
 
-This is equivalent to `kubectl create namespace demis`.
+This is equivalent to `kubectl create namespace <your name>`.
 
 Read back our object:
 
 ```
-kubectl get namespace demis -o yaml
+kubectl get namespace <your name> -o yaml
 ```
 
 Set you context namespace
 ```
-kubectl config set-context --current --namespace=demis
+kubectl config set-context --current --namespace=<your name>
 ```
 
 ---
 
 ## Base commannds
-```
+
+```shell
 kubectl get namespaces 
 kubectl get pods  --all-namespaces 
 kubectl get service 
@@ -128,8 +129,8 @@ kubectl describe node <node>
 ## Run a pod
 
 ```
-kubectl run web --image=nginx --replicas=3 --namespace demis 
-kubectl get pods --namespace demis
+kubectl run web --image=nginx --replicas=3 --namespace <your name> 
+kubectl get pods --namespace <your name>
 ```
 ---
 
