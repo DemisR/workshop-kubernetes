@@ -12,11 +12,11 @@ Create CNAME DNS record
 *.k8sworkshop.exxoss.academy. IN CNAME a5e60b411a16311e999ac0e344f0b4c0-109548033.eu-west-3.elb.amazonaws.com.
 ```
 
-You can access the UI by using the port-forwarding command in kubectl. To do this run;
-kubectl port-forward $(kubectl get pods 
- grep traefik 
- awk -F' ' '{print $1}DD') 8080:8080
+```
+kubectl apply -f ressources/traefik-ingress/traefik-ingress-admin.yaml
+```
 
+You can access the UI on http://traefik.k8sworkshop.exxoss.academy
 
 
 ---
