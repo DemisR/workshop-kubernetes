@@ -46,15 +46,18 @@ kubectl patch configmap/aws-auth -n kube-system --patch "$(cat /tmp/aws-auth-pat
       rolearn: arn:aws:iam::269592875733:role/eksctl-workshop-1-nodegroup-ng-c8-NodeInstanceRole-K2WG6VX59DUS
       username: system:node:{{EC2PrivateDNSName}}
   mapUsers: |
-    - userarn: arn:aws:iam::269592875733:user/thomas.soupart
-      username: thomas.soupart
+    - userarn: arn:aws:iam::269592875733:user/john.doe
+      username: john.doe
       groups:
         - system:masters
-    - userarn: arn:aws:iam::269592875733:user/lionel.schwanen
-      username: lionel.schwanen
+    - userarn: arn:aws:iam::269592875733:user/marco.rossi
+      username: marco.rossi
       groups:
         - system:masters
 ```
+
+Create an access key for a user 
+`aws iam create-access-key --user-name <username>`
 
 In AWS accounts that have never created a load balancer before, it’s possible that the service role for ELB might not exist yet.
 
