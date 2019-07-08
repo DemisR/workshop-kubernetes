@@ -56,6 +56,14 @@ kubectl patch configmap/aws-auth -n kube-system --patch "$(cat /tmp/aws-auth-pat
         - system:masters
 ```
 
+In AWS accounts that have never created a load balancer before, it’s possible that the service role for ELB might not exist yet.
+
+We can check for the role, and create it if it’s missing.
+
+Copy/Paste the following commands into your Cloud9 workspace:
+```
+aws iam get-role --role-name "AWSServiceRoleForElasticLoadBalancing" || aws iam create-service-linked-role --aws-service-name "elasticloadbalancing.amazonaws.com"
+```
 
 # GKE https://kadm-2019-06.container.training/#210
 # AKS https://kadm-2019-06.container.training/#213
