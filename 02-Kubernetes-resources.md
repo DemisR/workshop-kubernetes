@@ -1,9 +1,17 @@
-# Base objects
+# Base resources
+
+There are a lot of differents objects in k8s called `resources`
+
+These resources are organized by type, or `Kind` (in the API)
+
+For today, we focus on the most common
 - Pod
 - Service
 - Volume
 - Namespace
-...
+- Deployments
+
+We can see the full list by running `kubectl api-resources`
 
 ---
 

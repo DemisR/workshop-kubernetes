@@ -1,7 +1,7 @@
 # Summary
 
 - Kubernetes conceps and architecture
-- Objects (Pods,Services,...)
+- Resources (Pods,Services,...)
 - Setup your cli and basics commands
 - Your first k8s deployment
 
@@ -11,7 +11,7 @@ Require `reveal-md`
 
 ```
 reveal-md 01-Kubernetes-concepts.md --theme white --css css/custom.css
-reveal-md 02-Kubernetes-objects.md --theme white --css css/custom.css
+reveal-md 02-Kubernetes-resources.md --theme white --css css/custom.css
 ```
 
 
