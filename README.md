@@ -1,6 +1,6 @@
 # Summary
 
-- Kubernetes conceps and architecture
+- Kubernetes concepts and architecture
 - Resources (Pods,Services,...)
 - Setup your cli and basics commands
 - Your first k8s deployment
