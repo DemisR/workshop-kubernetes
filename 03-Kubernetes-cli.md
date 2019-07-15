@@ -53,7 +53,7 @@ Created with the tool `eksctl`.
 ## Requirement for easy access to EKS cluster
 Install `awscli`
 ```
-brew install aws-cli
+brew install awscli
 ```
 
 Configure with your aws key
