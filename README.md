@@ -12,6 +12,8 @@ Require `reveal-md`
 ```
 reveal-md 01-Kubernetes-concepts.md --theme white --css css/custom.css
 reveal-md 02-Kubernetes-resources.md --theme white --css css/custom.css
+reveal-md 03-Kubernetes-cli.md --theme white --css css/custom.css
+reveal-md 04-Kubernetes-deployments.md --theme white --css css/custom.css
 ```
 
 
