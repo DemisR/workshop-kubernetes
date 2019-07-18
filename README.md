@@ -25,7 +25,6 @@ https://qconuk2019.container.training
 
 ### Other resources
 
-
-http://kubernetesbyexample.com/
-https://kubernetesbootcamp.github.io/kubernetes-bootcamp/index.html
-https://eksworkshop.com
+- http://kubernetesbyexample.com
+- https://kubernetesbootcamp.github.io/kubernetes-bootcamp/index.html
+- https://eksworkshop.com
