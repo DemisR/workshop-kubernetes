@@ -7,15 +7,14 @@
 
 ## Slides
 
-Require `reveal-md`
+Install the dependencies and generate all four static slide decks:
 
-```
-reveal-md 01-Kubernetes-concepts.md --theme white --css css/custom.css
-reveal-md 02-Kubernetes-resources.md --theme white --css css/custom.css
-reveal-md 03-Kubernetes-cli.md --theme white --css css/custom.css
-reveal-md 04-Kubernetes-deployments.md --theme white --css css/custom.css
+```shell
+npm install
+npm run build
 ```
 
+The generated site is written to `dist`. Pushes to `master` automatically publish it to [GitHub Pages](https://demisr.github.io/workshop-kubernetes/).
 
 ## Credits
 
