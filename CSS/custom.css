@@ -140,6 +140,13 @@
   box-shadow: none;
 }
 
+.reveal img.workflow-frame {
+  width: 100%;
+  max-width: 100%;
+  max-height: 650px;
+  margin: 0 auto;
+}
+
 .eyebrow {
   margin: 0 0 1.1em;
   color: var(--blue);

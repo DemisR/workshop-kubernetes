@@ -104,7 +104,7 @@ kubectl get namespace workshop
 
 ---
 
-## Create the first Deployment
+## Submit the first Deployment
 
 ```shell
 kubectl create deployment podinfo \
@@ -121,6 +121,30 @@ kubectl rollout status deployment/podinfo
   <div class="connector">→</div>
   <div class="node workload">2 Pods</div>
 </div>
+
+---
+
+<img class="workflow-frame" src="images/kubectl-run-slideshow/06.svg" alt="The API server has stored the Deployment in etcd">
+
+---
+
+<img class="workflow-frame" src="images/kubectl-run-slideshow/07.svg" alt="The controller manager notices the new Deployment">
+
+---
+
+<img class="workflow-frame" src="images/kubectl-run-slideshow/10.svg" alt="The controller manager creates a ReplicaSet">
+
+---
+
+<img class="workflow-frame" src="images/kubectl-run-slideshow/13.svg" alt="The ReplicaSet creates pending Pods and the scheduler reacts">
+
+---
+
+<img class="workflow-frame" src="images/kubectl-run-slideshow/16.svg" alt="The scheduler assigns the Pods to worker nodes">
+
+---
+
+<img class="workflow-frame" src="images/kubectl-run-slideshow/19.svg" alt="The kubelets have started all Pods and their status is Running">
 
 ---
 
