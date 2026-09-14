@@ -2,7 +2,8 @@
   "name": "workshop-kubernetes-slides",
   "private": true,
   "scripts": {
-    "build": "rm -rf dist && reveal-md 01-Kubernetes-concepts.md --static dist/01-kubernetes-concepts --static-dirs=images --theme white --css CSS/custom.css && reveal-md 02-Kubernetes-resources.md --static dist/02-kubernetes-resources --static-dirs=images --theme white --css CSS/custom.css && reveal-md 03-Kubernetes-cli.md --static dist/03-kubernetes-cli --static-dirs=images --theme white --css CSS/custom.css && reveal-md 04-Kubernetes-deployments.md --static dist/04-kubernetes-deployments --static-dirs=images --theme white --css CSS/custom.css && cp index.html dist/index.html"
+    "dev": "reveal-md 01-Kubernetes-concepts.md --watch --theme white --css CSS/custom.css",
+    "build": "rm -rf dist && reveal-md 01-Kubernetes-concepts.md --static dist/01-kubernetes-concepts --theme white --css CSS/custom.css && reveal-md 02-Kubernetes-resources.md --static dist/02-kubernetes-resources --theme white --css CSS/custom.css && reveal-md 03-Kubernetes-cli.md --static dist/03-kubernetes-cli --theme white --css CSS/custom.css && reveal-md 04-Kubernetes-deployments.md --static dist/04-kubernetes-deployments --theme white --css CSS/custom.css && cp index.html dist/index.html"
   },
   "devDependencies": {
     "reveal-md": "6.1.4"

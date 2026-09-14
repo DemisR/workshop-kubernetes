@@ -1,44 +1,57 @@
----
-kind: Deployment
 apiVersion: apps/v1
+kind: Deployment
 metadata:
   name: podinfo
-  namespace: <your name>
+  namespace: workshop
+  labels:
+    app.kubernetes.io/name: podinfo
+    app.kubernetes.io/part-of: kubernetes-workshop
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
-      app: podinfo
+      app.kubernetes.io/name: podinfo
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
   template:
     metadata:
       labels:
-        app: podinfo
-      annotations:
-        prometheus.io/scrape: 'true'
+        app.kubernetes.io/name: podinfo
+        app.kubernetes.io/part-of: kubernetes-workshop
     spec:
+      automountServiceAccountToken: false
       containers:
-      - name: podinfod
-        image: quay.io/stefanprodan/podinfo:1.6.1
-        command:
-        - ./podinfo
-        - --port=9898
-        ports:
-        - containerPort: 9898
-        readinessProbe:
-          httpGet:
-            path: /readyz
-            port: 9898
-          initialDelaySeconds: 1
-          periodSeconds: 5
-          failureThreshold: 1
-        livenessProbe:
-          httpGet:
-            path: /healthz
-            port: 9898
-          initialDelaySeconds: 1
-          periodSeconds: 10
-          failureThreshold: 2
-        resources:
-          requests:
-            memory: "32Mi"
-            cpu: "10m"
+        - name: podinfo
+          image: ghcr.io/stefanprodan/podinfo:6.14.1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 9898
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: http
+            initialDelaySeconds: 2
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true

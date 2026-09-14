@@ -1,19 +1,21 @@
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  annotations:
-    kubernetes.io/ingress.class: traefik
-    traefik.frontend.rule.type: PathPrefixStrip
-  creationTimestamp: null
-  name: traefik-ingress
-  namespace: <your name>
+  name: podinfo
+  namespace: workshop
+  labels:
+    app.kubernetes.io/name: podinfo
+    app.kubernetes.io/part-of: kubernetes-workshop
 spec:
+  ingressClassName: nginx
   rules:
-  - http:
-      paths:
-      - backend:
-          serviceName: podinfo
-          servicePort: 9898
-        path: /<your name>
-status:
-  loadBalancer: {}
+    - host: podinfo.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: podinfo
+                port:
+                  name: http

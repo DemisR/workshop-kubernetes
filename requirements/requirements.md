@@ -1,11 +1,20 @@
-# Homebrew
+# Workshop requirements
 
-https://brew.sh/
+Install the following tools before the workshop:
 
-# kubernetes-cli
+- [Docker](https://docs.docker.com/get-docker/) or [Podman](https://podman.io/docs/installation)
+- [kind](https://kind.sigs.k8s.io/docs/user/quick-start/#installation)
+- [kubectl](https://kubernetes.io/docs/tasks/tools/)
 
-brew install kubernetes-cli
+On macOS with Homebrew:
 
-# Aws cli
+```shell
+brew install kubectl kind
+```
 
-brew install aws-cli
+Verify the installation:
+
+```shell
+kind version
+kubectl version --client
+```

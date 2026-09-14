@@ -1,189 +1,189 @@
+<p class="eyebrow">Module 01</p>
+
 # Kubernetes concepts
 
-- Kubernetes is a platform for managing containerized workloads and services, that facilitates declarative configuration and automation.
-
-- Kubernetes provides a **container-centric** management environment. It orchestrates computing, networking, and storage infrastructure on behalf of user workloads.
+<p class="lead">How Kubernetes turns a declared application state into running workloads.</p>
 
 ---
 
-## Basic things we can ask Kubernetes to do
+## The problem Kubernetes solves
 
-- Start 5 containers using image `atseashop/api:v1.3`
+You describe the result that you need:
 
-- Place an internal load balancer in front of these containers
+<div class="stack">
+  <div class="card fragment"><strong>Availability</strong><br>Keep three instances of the API ready.</div>
+  <div class="card fragment"><strong>Networking</strong><br>Give clients one stable address while Pods change.</div>
+  <div class="card fragment"><strong>Change</strong><br>Replace version 6.14.0 with 6.14.1 without dropping every instance at once.</div>
+</div>
 
-- Start 10 containers using image `atseashop/webfront:v1.3`
-
-- Place a public load balancer in front of these containers
-
-- It's Black Friday, traffic spikes, grow our cluster and add containers
-
-- New release! Replace my containers with the new image `atseashop/webfront:v1.4`
-
-- Keep processing requests during the upgrade; update my containers one at a time
+<p class="fragment">Kubernetes keeps working toward that result.</p>
 
 ---
 
-## Other things that Kubernetes can do for us
+## The reconciliation loop
 
-- Basic autoscaling
-- Blue/green deployment, canary deployment
-- Long running services, but also batch (one-off) jobs
-- Overcommit our cluster and *evict* low-priority jobs
-- Run services with *stateful* data (databases etc.)
-- Fine-grained access control defining *what* can be done by *whom* on *which* resources
-- Integrating third party services (*service catalog*)
-- Automating complex tasks (*operators*)
+<div class="diagram">
+  <div class="node control">Desired state<br><strong>3 replicas</strong></div>
+  <div class="connector fragment">⇄</div>
+  <div class="node data fragment">API state<br><strong>2 ready</strong></div>
+  <div class="connector fragment">→</div>
+  <div class="node workload fragment">Controller<br><strong>creates 1 Pod</strong></div>
+</div>
 
----
+<p class="fragment">Controllers compare desired state with observed state. Each controller makes small changes until both match.</p>
 
-## Kubernetes architecture
-
-![](images/k8s-arch1.png)
+> Declarative does not mean passive. It means that control loops choose the steps.
 
 ---
 
-## Nodes
+## Cluster architecture
 
-- The nodes executing our containers run a collection of services:
+<div class="cluster">
+  <div class="cluster-zone">
+    <strong>Control plane</strong>
+    <div class="node control fragment">API server<br><span class="small">validates requests</span></div>
+    <div class="node control fragment">etcd<br><span class="small">stores API data</span></div>
+    <div class="node control fragment">Scheduler and controllers<br><span class="small">make decisions</span></div>
+  </div>
+  <div class="cluster-zone fragment">
+    <strong>Worker nodes</strong>
+    <div class="node workload">kubelet<br><span class="small">maintains Pods</span></div>
+    <div class="node workload">Container runtime<br><span class="small">runs containers</span></div>
+    <div class="node workload">Pod network and Service proxy<br><span class="small">moves traffic</span></div>
+  </div>
+</div>
 
-  - a container Engine (typically Docker)
-
-  - kubelet (the "node agent")
-
-  - kube-proxy (a necessary but not sufficient network component)
-
-- Nodes were formerly called "minions"
-
-  (You might see that word in older articles or documentation)
-
----
-
-## The Control plane
-
-- The Kubernetes logic (its "brains") is a collection of services:
-
-  - the **API server** (our point of entry to everything!)
-
-  - core services like the **scheduler** and **controller manager**
-
-  - **etcd** (a highly available key/value store; the "database" of Kubernetes)
-
-- Together, these services form the control plane of our cluster
-
-- The control plane is also called the **"master"**
+<p class="source">Source: <a href="https://kubernetes.io/docs/concepts/architecture/">Kubernetes cluster architecture</a></p>
 
 ---
 
-![One of the best Kubernetes architecture diagrams available](images/k8s-arch4-thanks-luxas.png)
+## A request through the control plane
+
+<div class="flow">
+  <div class="node">1. kubectl</div>
+  <div class="node control fragment">2. API server</div>
+  <div class="node data fragment">3. etcd</div>
+  <div class="node workload fragment">4. Controller</div>
+</div>
+
+<ol>
+  <li class="fragment">The API server authenticates, authorizes, and validates the request.</li>
+  <li class="fragment">The API object becomes durable cluster state.</li>
+  <li class="fragment">Controllers notice the change and act.</li>
+</ol>
 
 ---
 
-## Running the control plane on special nodes
+## Scheduling a Pod
 
-- It is common to reserve a dedicated node for the control plane
-  (Except for single-node development clusters, like when using minikube)
-- This node is then called a "master"
-  (Yes, this is ambiguous: is the "master" a node, or the whole control plane?)
-- Normal applications are restricted from running on this node
-  (By using a mechanism called ["taints"](https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/))
-- When high availability is required, each service of the control plane must be resilient
-- The control plane is then replicated on multiple nodes
-  (This is sometimes called a **"multi-master"** setup)
+<div class="two-col">
+  <div>
+    <h3>Inputs</h3>
+    <ul>
+      <li class="fragment">CPU and memory requests</li>
+      <li class="fragment">Node selectors and affinity</li>
+      <li class="fragment">Taints, tolerations, and topology rules</li>
+    </ul>
+  </div>
+  <div>
+    <h3>Decision</h3>
+    <div class="diagram vertical">
+      <div class="node bad fragment">Nodes that cannot run the Pod</div>
+      <div class="connector fragment">↓</div>
+      <div class="node good fragment">Best feasible node</div>
+    </div>
+  </div>
+</div>
 
----
-
-## Running the control plane outside containers
-
-- The services of the control plane can run in or out of containers
-
-- For instance: since `etcd` is a critical service, some people
-  deploy it directly on a dedicated cluster (without containers)
-
-- In some hosted Kubernetes offerings (e.g. AKS, GKE, EKS), the control plane is invisible
-
-  (We only "see" a Kubernetes API endpoint)
-
-- In that case, there is no "master node"
-
-*For this reason, it is more accurate to say "control plane" rather than "master."*
+<p class="fragment">The scheduler assigns the Pod to a node. The kubelet on that node starts it.</p>
 
 ---
 
-## Do we need to run Docker at all?
+## What runs on a worker node
 
-**No... But for the moment Yes!**
+<div class="diagram">
+  <div class="node control">API server</div>
+  <div class="connector fragment">→</div>
+  <div class="node workload fragment">kubelet</div>
+  <div class="connector fragment">→</div>
+  <div class="node workload fragment">CRI runtime</div>
+  <div class="connector fragment">→</div>
+  <div class="node good fragment">Containers</div>
+</div>
 
-- By default, Kubernetes uses the Docker Engine to run containers
+- `kubelet` watches Pod specifications assigned to its node.
+- A CRI-compatible runtime, commonly containerd or CRI-O, runs the containers.
+- The network plugin gives each Pod network connectivity.
 
-- We could also use `rkt` ("Rocket") from CoreOS
-
-- Or leverage other pluggable runtimes through the *Container Runtime Interface*
-
-  (like **CRI-O**, or **containerd**)
-
-- On our development environments, CI pipelines ... :
-*Yes, almost certainly*
-
-- On our production servers:
-*Yes (today)*
-*Probably not (in the future)*
-
----
-
-## Interacting with Kubernetes
-
-- We will interact with our Kubernetes cluster through the Kubernetes API
-
-- The Kubernetes API is (mostly) RESTful
-
-- It allows us to create, read, update, delete *resources*
-
-- A few common resource types are:
-
-  - **node** (a machine — physical or virtual — in our cluster)
-
-  - **pod** (group of containers running together on a node)
-
-  - **service** (stable network endpoint to connect to one or multiple containers)
+<p class="source">Source: <a href="https://kubernetes.io/docs/setup/production-environment/container-runtimes/">Kubernetes container runtimes</a></p>
 
 ---
 
-![Node, pod, container](images/k8s-arch3-thanks-weave.png)
+## Docker images still work
+
+<div class="two-col">
+  <div class="card">
+    <h3>Build time</h3>
+    <p>Docker, BuildKit, Podman, or another OCI tool creates the image.</p>
+  </div>
+  <div class="card fragment">
+    <h3>Run time</h3>
+    <p>The kubelet asks a CRI runtime to pull and run the image.</p>
+  </div>
+</div>
+
+<p class="fragment">Kubernetes removed its built-in Docker Engine adapter, <code>dockershim</code>, in version 1.24. It did not remove support for OCI container images.</p>
+
+<p class="source">Source: <a href="https://kubernetes.io/docs/tasks/administer-cluster/migrating-from-dockershim/check-if-dockershim-removal-affects-you/">Dockershim removal</a></p>
 
 ---
 
-![k8s archi](images/k8s-arch2.png)
+## Self-healing after a failure
+
+<div class="flow">
+  <div class="node good">3 ready Pods</div>
+  <div class="node bad fragment">1 Pod fails</div>
+  <div class="node data fragment">Deployment sees 2 of 3</div>
+  <div class="node good fragment">Replacement Pod becomes ready</div>
+</div>
+
+<p class="fragment">Kubernetes replaces the failed Pod. Your application must still handle data consistency, retries, and graceful shutdown.</p>
 
 ---
 
-![k8s archi details](images/k8s-arch4-thanks-luxas.png)
+## What Kubernetes provides
+
+<div class="two-col">
+  <div>
+    <h3>Built-in mechanisms</h3>
+    <ul>
+      <li>Scheduling and self-healing</li>
+      <li>Service discovery and load distribution</li>
+      <li>Rollouts, Jobs, and horizontal scaling</li>
+      <li>Configuration, Secrets, and storage attachment</li>
+    </ul>
+  </div>
+  <div class="fragment">
+    <h3>You still choose</h3>
+    <ul>
+      <li>Cluster platform and upgrades</li>
+      <li>Observability and delivery tools</li>
+      <li>Security policy and network controls</li>
+      <li>How the application stores state</li>
+    </ul>
+  </div>
+</div>
 
 ---
 
-# Declarative vs imperative
+## The mental model
 
-Our container orchestrator puts a very strong emphasis on being declarative
+<div class="diagram vertical">
+  <div class="node control">Declare resources through the API</div>
+  <div class="connector fragment">↓</div>
+  <div class="node data fragment">Controllers reconcile desired and observed state</div>
+  <div class="connector fragment">↓</div>
+  <div class="node good fragment">Pods run on worker nodes</div>
+</div>
 
-### Declarative : 
-<!-- .element: class="fragment" data-fragment-index="1"-->
-I would like a cup of tea.
-<!-- .element: class="fragment" data-fragment-index="1"-->
-
-### Imperative :
-<!-- .element: class="fragment" data-fragment-index="2"-->
-Boil some water. Pour it in a teapot. Add tea leaves. Steep for a while. Serve in a cup.
-<!-- .element: class="fragment" data-fragment-index="2"-->
-
----
-
-**Declarative seems simpler at first ...**
-**As long as you know how to brew tea**
-<!-- .element: class="fragment" data-fragment-index="1"-->
-
-### What declarative would really be :
-<!-- .element: class="fragment" data-fragment-index="2"-->
-I want a cup of tea, obtained by pouring an infusion of tea leaves in a cup.
-An infusion is obtained by letting the object steep a few minutes in hot water.
-Hot liquid is obtained by pouring it in an appropriate container and setting it on a stove.
-<!-- .element: class="fragment" data-fragment-index="2"-->
+<p class="fragment lead">Next: the resource types that describe an application.</p>

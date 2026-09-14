@@ -1,165 +1,220 @@
-# Base resources
+<p class="eyebrow">Module 02</p>
 
-There are a lot of differents objects in k8s called `resources`
+# Kubernetes resources
 
-These resources are organized by type, or `Kind` (in the API)
-
-For today, we focus on the most common
-- Pod
-- Service
-- Volume
-- Namespace
-- Deployments
-
-We can see the full list by running `kubectl api-resources`
+<p class="lead">The API objects used to run, connect, configure, and store an application.</p>
 
 ---
 
-## Pods
+## Every resource has the same envelope
 
-In Docker World, Every Microservice is deployed as Container.
-In K8s world, A Pod is the basic building block of K8s Objects.
+```yaml
+apiVersion: apps/v1       # API group and version
+kind: Deployment          # Resource type
+metadata:
+  name: podinfo
+  namespace: workshop
+spec:                     # Desired state
+  replicas: 2
+```
 
-A pod is a **colocated group of containers**.
-A pod can contain single container as well.
-But when it contains multiple containers, all of the containers are running on single worker node.
-A pod won’t distribute across multiple worker nodes.
+<p class="fragment"><code>status</code> reports observed state. Controllers update it. You normally write <code>spec</code>.</p>
+
+<span class="terminal-line fragment">kubectl explain deployment.spec</span>
+
+---
+
+## Pod
+
+<div class="two-col wide-right">
+  <div>
+    <p>A Pod is the smallest deployable unit.</p>
+    <ul>
+      <li class="fragment">One or more containers</li>
+      <li class="fragment">One IP address</li>
+      <li class="fragment">Shared network and attached volumes</li>
+      <li class="fragment">Scheduled together on one node</li>
+    </ul>
+  </div>
+  <div>
 
 ```yaml
 apiVersion: v1
 kind: Pod
 metadata:
-  name: myapp-pod
-  labels:
-    app: myapp
+  name: podinfo
 spec:
   containers:
-  - name: myapp-container
-    image: busybox
-    command: ['sh', '-c', 'echo Hello Kubernetes! && sleep 3600']
+    - name: podinfo
+      image: ghcr.io/stefanprodan/podinfo:6.14.1
+      ports:
+        - containerPort: 9898
 ```
-<!-- .element: class="fragment" -->
+
+  </div>
+</div>
 
 ---
 
-## Services
-**Logical set of Pods**
+## Labels connect resources
 
-An abstract way to expose an application running on a set of Pods as a network service.
+<div class="diagram">
+  <div class="node control">Deployment<br><code>app=podinfo</code></div>
+  <div class="connector fragment">→</div>
+  <div class="node workload fragment">Pod<br><code>app=podinfo</code></div>
+  <div class="node workload fragment">Pod<br><code>app=podinfo</code></div>
+  <div class="node workload fragment">Pod<br><code>app=podinfo</code></div>
+</div>
 
-```yaml
-apiVersion: v1
-kind: Service
-metadata:
-   name: myapp-service
-spec:
-  ports:
-  - port: 80
-    protocol: TCP
-  selector:
-     app: myapp
-``` 
-<!-- .element: class="fragment" -->
+<p class="fragment">A selector finds resources by label. Names identify one object. Labels create a changing set.</p>
 
----
-
-## Volume
-In Docker, a volume is simply a directory on disk or in another Container. Lifetimes are not managed.
-
-A Kubernetes volume, has an explicit lifetime (the same as the Pod that encloses it).
-Data is preserved across Container restarts.
-
-Some types of Volumes: awsElasticBlockStore, iscsi, local, nfs, glusterfs, ... 
-<!-- .element: class="fragment" -->
-
----
-
-## PersistentVolume and PersistentVolumeClaim
-
-Abstracts details of how storage is provided from how it is consumed.
-
-| Type of storage | How long does it last?  |
-| ------------- | -----|
-| Container filesystem | Container lifetime |
-| Volume (k8s) | Pod lifetime |
-| Persistent volume | Cluster lifetime |
-
----
-
-## Namespaces
-
-Kubernetes supports multiple **virtual clusters** backed by the same physical cluster.
-These virtual clusters are called namespaces.
-
-Namespaces are intended for use in environments with many users spread across multiple teams, or projects
-
----
-
-# Controllers 
-- ReplicaSet
-- Deployment
-- StatefulSet
-- DaemonSet
-- Job
-...
-
----
-
-## ReplicaSet
-A ReplicaSet **ensures that a specified number of pod replicas are running at any given time**.
-However, a Deployment is a higher-level concept that manages ReplicaSets and provides declarative updates to Pods along with a lot of other useful features. Therefore, we recommend using Deployments instead of directly using ReplicaSets, unless you require custom update orchestration or don’t require updates at all.
-
-This actually means that you may never need to manipulate ReplicaSet objects: **use a Deployment instead**, and define your application in the spec section.
-
-
----
-
-## Deployments
-
-A Deployment controller provides **declarative** updates for **Pods** and **ReplicaSets**.
-You describe a **desired state** in a Deployment object, and the Deployment controller changes the actual state to the desired state at a controlled rate.
-
-```yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: nginx-deployment
-  labels:
-    app: nginx
-spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: nginx
-  template:
-    metadata:
-      labels:
-        app: nginx
-    spec:
-      containers:
-      - name: nginx
-        image: nginx:1.7.9
-        ports:
-        - containerPort: 80
+```shell
+kubectl get pods -l app.kubernetes.io/name=podinfo
 ```
-<!-- .element: class="fragment" -->
 
 ---
 
-## DaemonSet
-A DaemonSet **ensures that all (or some) Nodes run a copy of a Pod**. 
+## Deployment, ReplicaSet, and Pods
 
-Usefull for monitoring hosts or collect logs for example.
+<div class="diagram vertical">
+  <div class="node control">Deployment<br><span class="small">rollout policy and Pod template</span></div>
+  <div class="connector fragment">↓</div>
+  <div class="node data fragment">ReplicaSet<br><span class="small">replica count for one template</span></div>
+  <div class="connector fragment">↓</div>
+  <div class="diagram fragment">
+    <div class="node workload">Pod</div>
+    <div class="node workload">Pod</div>
+    <div class="node workload">Pod</div>
+  </div>
+</div>
 
-## StatefulSet  
-<!-- .element: class="fragment" data-fragment-index="1"-->
-StatefulSet is the workload API object used to <!-- .element: class="fragment" data-fragment-index="1"--> **manage stateful applications**.
-<!-- .element: class="fragment" data-fragment-index="1"-->
+<p class="fragment">Create Deployments. Let the Deployment manage ReplicaSets and Pods.</p>
 
 ---
 
-![](images/k8s-objects.png)
+## Service
+
+<p>A Service gives a changing set of Pods a stable network name and virtual IP.</p>
+
+<div class="diagram">
+  <div class="node control">Client</div>
+  <div class="connector fragment">→</div>
+  <div class="node data fragment">Service<br><code>podinfo:9898</code></div>
+  <div class="connector fragment">→</div>
+  <div class="diagram vertical fragment">
+    <div class="node workload">Ready Pod</div>
+    <div class="node workload">Ready Pod</div>
+  </div>
+</div>
+
+<p class="fragment">The Service selects Pods by label. It does not care which node hosts them.</p>
 
 ---
 
-![](images/module_04_services.svg)
+## Service types
+
+| Type | Reachable from | Typical use |
+| --- | --- | --- |
+| `ClusterIP` | Inside the cluster | Service-to-Service traffic |
+| `NodePort` | A port on every node | Labs and infrastructure integrations |
+| `LoadBalancer` | An external address | Cloud or load-balancer integration |
+| `ExternalName` | Cluster DNS | Alias for an external DNS name |
+
+<p class="fragment"><code>ClusterIP</code> is the default. HTTP routing across several Services usually belongs in Gateway API or Ingress.</p>
+
+---
+
+## EndpointSlices follow the Pods
+
+<div class="flow">
+  <div class="node control">Service selector</div>
+  <div class="node data fragment">EndpointSlice<br><code>10.244.1.5:9898</code></div>
+  <div class="node data fragment">EndpointSlice<br><code>10.244.2.8:9898</code></div>
+  <div class="node workload fragment">Service proxy or network plugin</div>
+</div>
+
+<p class="fragment">Kubernetes updates EndpointSlices as matching Pods appear, disappear, or become unready.</p>
+
+<p class="source">Source: <a href="https://kubernetes.io/docs/concepts/services-networking/">Services, load balancing, and networking</a></p>
+
+---
+
+## ConfigMap and Secret
+
+<div class="two-col">
+  <div class="card">
+    <h3>ConfigMap</h3>
+    <p>Non-confidential configuration such as a feature flag or log level.</p>
+  </div>
+  <div class="card fragment">
+    <h3>Secret</h3>
+    <p>Sensitive values such as a token or password. Base64 encoding does not encrypt the value.</p>
+  </div>
+</div>
+
+<p class="fragment">A Pod can read both as environment variables or mounted files. Your cluster still needs access controls and encryption appropriate to the data.</p>
+
+---
+
+## Storage lifetime
+
+| Storage | Survives a container restart | Survives Pod replacement |
+| --- | :---: | :---: |
+| Container writable layer | No | No |
+| Pod volume such as `emptyDir` | Yes | No |
+| PersistentVolumeClaim | Yes | Yes |
+
+<div class="diagram fragment">
+  <div class="node workload">Pod</div>
+  <div class="connector">→</div>
+  <div class="node data">PersistentVolumeClaim</div>
+  <div class="connector">→</div>
+  <div class="node good">Storage provided by a StorageClass</div>
+</div>
+
+---
+
+## Workload controllers
+
+| Resource | Use it for |
+| --- | --- |
+| Deployment | Interchangeable, usually stateless replicas |
+| StatefulSet | Pods that need stable identity or storage |
+| DaemonSet | One Pod on every selected node |
+| Job | Work that runs to completion |
+| CronJob | Jobs on a schedule |
+
+<p class="fragment">Choose the controller from the workload's lifecycle. The container image does not decide.</p>
+
+---
+
+## Namespaces and boundaries
+
+<div class="two-col">
+  <div>
+    <h3>Namespaces group resources</h3>
+    <p>Names only need to be unique inside a namespace.</p>
+  </div>
+  <div class="fragment">
+    <h3>Policies create boundaries</h3>
+    <p>RBAC, ResourceQuota, LimitRange, and NetworkPolicy control access and consumption.</p>
+  </div>
+</div>
+
+> A namespace alone does not isolate network traffic or make a hostile workload safe.
+
+---
+
+## One application, several resources
+
+<div class="diagram vertical">
+  <div class="node control">Deployment<br><span class="small">keeps Pods running</span></div>
+  <div class="diagram fragment">
+    <div class="node data">ConfigMap and Secret</div>
+    <div class="node workload">Pods</div>
+    <div class="node data">PersistentVolumeClaim</div>
+  </div>
+  <div class="node good fragment">Service<br><span class="small">gives the Pods one endpoint</span></div>
+</div>
+
+<p class="fragment lead">Next: use <code>kubectl</code> to see these relationships in a live cluster.</p>

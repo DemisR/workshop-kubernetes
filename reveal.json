@@ -1,8 +1,10 @@
 {
     "progress": true,
-    "slideNumber": false,
-    "controls": false,
+    "slideNumber": "c/t",
+    "controls": true,
     "center": false,
     "transition": "none",
-    "margin": 0
+    "margin": 0.04,
+    "hash": true,
+    "navigationMode": "linear"
 }

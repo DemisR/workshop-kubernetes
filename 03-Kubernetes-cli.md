@@ -1,224 +1,221 @@
-# The Kubernetes CLI : kubectl
-## Prepare your cli
+<p class="eyebrow">Module 03</p>
 
-Install `kubectl`
-```
-brew install kubernetes-cli
-```
-Check version `kubectl version`
+# kubectl and a local cluster
+
+<p class="lead">Create a disposable kind cluster, query the API, and debug a workload.</p>
 
 ---
 
-## Enable kubectl autocompletion
-### Bash on MacOS
+## Workshop tools
 
-You can test if you have bash-completion v2 already installed with `type _init_completion`. If not, you can install it with Homebrew:
+<div class="two-col">
+  <div>
+    <h3>Required</h3>
+    <ul>
+      <li><code>kubectl</code></li>
+      <li><code>kind</code></li>
+      <li>Docker or Podman</li>
+    </ul>
+  </div>
+  <div class="fragment">
+    <h3>macOS with Homebrew</h3>
 
-```
-brew install bash-completion@2
-```
-
-As stated in the output of this command, add the following to your `~/.bashrc` file:
-
-```
-export BASH_COMPLETION_COMPAT_DIR="/usr/local/etc/bash_completion.d"
-[[ -r "/usr/local/etc/profile.d/bash_completion.sh" ]] && . "/usr/local/etc/profile.d/bash_completion.sh"
-```
-
-Enable kubectl autocompletion
-
-```
-echo 'source <(kubectl completion bash)' >>~/.bashrc
-```
-
----
-
-## Enable kubectl autocompletion
-### Zsh on MacOS
-
-```
-echo 'source <(kubectl completion zsh)' >>~/.zshrc 
-```
-
----
-
-## Workshop cluster
-
-The cluster for the workshop is a manager k8s on AWS ( EKS ).
-
-Created with the tool `eksctl`.
-
----
-
-## Requirement for easy access to EKS cluster
-Install `awscli`
-```
-brew install awscli
-```
-
-Configure with your aws key
 ```shell
-$ aws configure
-AWS Access Key ID [None]: AKIAIOSFODNN7EXAMPLE
-AWS Secret Access Key [None]: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
-Default region name [None]: eu-west-3
-Default output format [None]: json
+brew install kubectl kind
 ```
+
+  </div>
+</div>
+
+<p class="small">Other platforms: <a href="https://kubernetes.io/docs/tasks/tools/">install kubectl</a> and <a href="https://kind.sigs.k8s.io/docs/user/quick-start/#installation">install kind</a>.</p>
 
 ---
 
-## Configure your kubectl 
+## Create the cluster
 
-We can update our kubectl config file to use the aws-cli for pulling IAM tokens with this command:
-
-```
-aws eks update-kubeconfig --name workshop-1 --region eu-west-3 # this updates kubeconfig to pull iam tokens using aws-cli
+```shell
+kind create cluster --name workshop --wait 90s
 ```
 
-Check the accessibility to the cluster
-```
+<p class="fragment">kind runs Kubernetes nodes as containers on your machine. The cluster is disposable, but the Kubernetes API is real.</p>
+
+```shell
+kubectl cluster-info --context kind-workshop
 kubectl get nodes
-kubectl get service 
 ```
+<!-- .element: class="fragment" -->
+
+<p class="fragment small">Expected: one control-plane node with status <code>Ready</code>.</p>
 
 ---
 
-## Create your namespace
+## kubeconfig and contexts
 
-Create a namespace with the following command:
-
-```yaml
-kubectl create -f- <<EOF
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: <your name>
-EOF
-```
-
-This is equivalent to `kubectl create namespace <your name>`.
-
-Read back our object:
-
-```
-kubectl get namespace <your name> -o yaml
-```
-
-Set you context namespace
-```
-kubectl config set-context --current --namespace=<your name>
-```
-
----
-
-## Base commannds
+<div class="diagram">
+  <div class="node data">kubeconfig</div>
+  <div class="connector fragment">→</div>
+  <div class="node control fragment">Context<br><span class="small">cluster + user + namespace</span></div>
+  <div class="connector fragment">→</div>
+  <div class="node workload fragment">API server</div>
+</div>
 
 ```shell
-kubectl get namespaces 
-kubectl get pods  --all-namespaces 
-kubectl get service 
+kubectl config get-contexts
+kubectl config current-context
+kubectl config use-context kind-workshop
+```
 
-kubectl describe pod <name>  
+<p class="fragment">Read the current context before any command that changes a cluster.</p>
 
-kubectl cluster-info
-kubectl describe node <node>
+---
+
+## Discover the API
+
+```shell
+kubectl api-resources
+kubectl explain deployment
+kubectl explain deployment.spec.template.spec.containers
+```
+
+<div class="two-col fragment">
+  <div class="card">
+    <h3>Resource discovery</h3>
+    <p>Shows names, short names, API groups, scope, and kinds supported by this cluster.</p>
+  </div>
+  <div class="card">
+    <h3>Schema help</h3>
+    <p>Explains fields from the API schema that your current cluster serves.</p>
+  </div>
+</div>
+
+---
+
+## Create a namespace
+
+```shell
+kubectl create namespace workshop
+kubectl config set-context --current --namespace=workshop
+kubectl get namespace workshop
+```
+
+<p class="fragment">The context now supplies <code>--namespace=workshop</code> for namespaced commands.</p>
+
+<span class="terminal-line fragment">kubectl config view --minify | grep namespace</span>
+
+---
+
+## Create the first Deployment
+
+```shell
+kubectl create deployment podinfo \
+  --image=ghcr.io/stefanprodan/podinfo:6.14.1 \
+  --replicas=2
+
+kubectl rollout status deployment/podinfo
+```
+
+<div class="diagram fragment">
+  <div class="node control">Deployment</div>
+  <div class="connector">→</div>
+  <div class="node data">ReplicaSet</div>
+  <div class="connector">→</div>
+  <div class="node workload">2 Pods</div>
+</div>
+
+---
+
+## Inspect the resources
+
+```shell
+kubectl get deployment,replicaset,pod
+kubectl get pods -o wide
+kubectl describe deployment podinfo
+```
+
+<p class="fragment">Start broad, then inspect the resource whose status looks wrong.</p>
+
+```shell
+kubectl get pods \
+  -l app=podinfo \
+  -o custom-columns=NAME:.metadata.name,NODE:.spec.nodeName,READY:.status.containerStatuses[0].ready
+```
+<!-- .element: class="fragment" -->
+
+---
+
+## Use output for the next question
+
+| Need | Command |
+| --- | --- |
+| Readable list | `kubectl get pods -o wide` |
+| Complete object | `kubectl get pod NAME -o yaml` |
+| Selected fields | `kubectl get pods -o custom-columns=...` |
+| Script input | `kubectl get pods -o json` |
+
+<p class="fragment">Prefer structured output for scripts. Human-readable columns can change.</p>
+
+---
+
+## A debugging path
+
+<div class="flow">
+  <div class="node">1. get<br><span class="small">find the symptom</span></div>
+  <div class="node data fragment">2. describe<br><span class="small">read events and state</span></div>
+  <div class="node workload fragment">3. logs<br><span class="small">inspect the process</span></div>
+  <div class="node good fragment">4. exec or debug<br><span class="small">test inside the network</span></div>
+</div>
+
+```shell
+kubectl get pods
+kubectl describe pod POD_NAME
+kubectl logs POD_NAME
+kubectl logs POD_NAME --previous
 ```
 
 ---
 
-## Run a pod
+## Reach and inspect the application
 
-```
-kubectl run web --image=nginx --replicas=3 --namespace <your name> 
-kubectl get pods --namespace <your name>
-```
----
-
-![](images/kubectl-run-slideshow/01.svg)
-
----
-
-![](images/kubectl-run-slideshow/02.svg)
-
----
-
-![](images/kubectl-run-slideshow/03.svg)
-
----
-
-![](images/kubectl-run-slideshow/04.svg)
-
----
-
-![](images/kubectl-run-slideshow/05.svg)
-
----
-
-![](images/kubectl-run-slideshow/06.svg)
-
----
-
-![](images/kubectl-run-slideshow/07.svg)
-
----
-
-![](images/kubectl-run-slideshow/08.svg)
-
----
-
-![](images/kubectl-run-slideshow/09.svg)
-
----
-
-![](images/kubectl-run-slideshow/10.svg)
-
----
-
-![](images/kubectl-run-slideshow/11.svg)
-
----
-
-![](images/kubectl-run-slideshow/12.svg)
-
----
-
-![](images/kubectl-run-slideshow/13.svg)
-
----
-
-![](images/kubectl-run-slideshow/14.svg)
-
----
-
-![](images/kubectl-run-slideshow/15.svg)
-
----
-
-![](images/kubectl-run-slideshow/16.svg)
-
----
-
-![](images/kubectl-run-slideshow/17.svg)
-
----
-
-![](images/kubectl-run-slideshow/18.svg)
-
----
-
-![](images/kubectl-run-slideshow/19.svg)
-
----
-
-```
-kubectl get deployments  
-kubectl delete deployments web
+```shell
+kubectl port-forward deployment/podinfo 9898:9898
 ```
 
+<p class="fragment">Open <a href="http://localhost:9898">http://localhost:9898</a> in another terminal or browser.</p>
+
+```shell
+curl http://localhost:9898/healthz
+kubectl exec deploy/podinfo -- cat /etc/os-release
+```
+<!-- .element: class="fragment" -->
+
+<p class="small fragment">Press Ctrl+C to stop the port forward.</p>
+
 ---
 
+## Scale and restart
 
+```shell
+kubectl scale deployment/podinfo --replicas=3
+kubectl get pods --watch
+```
 
+<p class="fragment">Stop the watch with Ctrl+C, then restart every Pod through the Deployment:</p>
 
+```shell
+kubectl rollout restart deployment/podinfo
+kubectl rollout status deployment/podinfo
+kubectl rollout history deployment/podinfo
+```
+<!-- .element: class="fragment" -->
 
+---
 
+## Clean up the practice workload
+
+```shell
+kubectl delete deployment podinfo
+```
+
+<p class="fragment">Keep the <code>workshop</code> namespace and kind cluster. The next module applies reviewed YAML manifests to both.</p>
+
+<p class="source">Command reference: <a href="https://kubernetes.io/docs/reference/kubectl/quick-reference/">kubectl quick reference</a></p>

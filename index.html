@@ -3,91 +3,121 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="A hands-on workshop that explains Kubernetes through diagrams, animations, and a local cluster.">
     <title>Kubernetes Workshop</title>
     <style>
       :root {
         color-scheme: light;
-        font-family: Georgia, "Times New Roman", serif;
-        color: #172121;
-        background: #f3f0e8;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: #102a43;
+        background: #f7f9fc;
       }
-
-      body {
-        margin: 0;
-      }
-
+      * { box-sizing: border-box; }
+      body { margin: 0; }
       main {
-        width: min(52rem, calc(100% - 2rem));
+        width: min(68rem, calc(100% - 2rem));
         margin: 0 auto;
-        padding: clamp(3rem, 10vw, 7rem) 0;
+        padding: clamp(3rem, 9vw, 7rem) 0;
       }
-
+      .eyebrow {
+        margin: 0 0 1.25rem;
+        color: #326ce5;
+        font-size: 0.78rem;
+        font-weight: 800;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
       h1 {
-        max-width: 10ch;
-        margin: 0 0 3rem;
-        font-size: clamp(3rem, 10vw, 6.5rem);
-        font-weight: 400;
+        max-width: 11ch;
+        margin: 0;
+        font-size: clamp(3.2rem, 9vw, 7rem);
+        font-weight: 780;
         line-height: 0.92;
-        letter-spacing: 0;
+        letter-spacing: -0.06em;
       }
-
+      .intro {
+        max-width: 42rem;
+        margin: 1.75rem 0 3.5rem;
+        color: #52667a;
+        font-size: clamp(1.05rem, 2vw, 1.35rem);
+        line-height: 1.55;
+      }
       ol {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1rem;
         margin: 0;
         padding: 0;
-        border-top: 1px solid #172121;
         list-style: none;
         counter-reset: deck;
       }
-
-      li {
-        counter-increment: deck;
-        border-bottom: 1px solid #172121;
-      }
-
-      a {
+      li { counter-increment: deck; }
+      nav a {
         display: grid;
-        grid-template-columns: 3rem 1fr auto;
+        grid-template-columns: 2.5rem 1fr auto;
         gap: 1rem;
-        align-items: center;
-        min-height: 5rem;
+        align-items: start;
+        min-height: 10rem;
+        padding: 1.4rem;
+        border: 1px solid #cbd7e5;
+        border-radius: 14px;
         color: inherit;
+        background: #fff;
         text-decoration: none;
+        transition: border-color 150ms ease, transform 150ms ease, box-shadow 150ms ease;
       }
-
-      a::before {
+      nav a::before {
         content: "0" counter(deck);
+        color: #326ce5;
         font-family: ui-monospace, monospace;
-        font-size: 0.75rem;
+        font-size: 0.8rem;
+        font-weight: 700;
       }
-
-      a::after {
-        content: "\2192";
-        font-size: 1.5rem;
+      nav a::after {
+        content: "\2197";
+        color: #326ce5;
+        font-size: 1.25rem;
       }
-
-      a:hover,
-      a:focus-visible {
-        color: #b53a22;
+      nav a:hover,
+      nav a:focus-visible {
+        border-color: #326ce5;
+        box-shadow: 0 16px 36px rgba(22, 75, 155, 0.12);
+        transform: translateY(-2px);
       }
-
-      @media (max-width: 32rem) {
-        a {
-          grid-template-columns: 2rem 1fr auto;
-        }
+      nav a strong {
+        display: block;
+        margin-bottom: 0.65rem;
+        font-size: 1.2rem;
+      }
+      nav a span {
+        color: #52667a;
+        line-height: 1.45;
+      }
+      footer {
+        margin-top: 2.5rem;
+        color: #52667a;
+        font-size: 0.9rem;
+      }
+      footer a { color: #164b9b; }
+      @media (max-width: 44rem) {
+        ol { grid-template-columns: 1fr; }
       }
     </style>
   </head>
   <body>
     <main>
+      <p class="eyebrow">Hands-on course</p>
       <h1>Kubernetes Workshop</h1>
+      <p class="intro">Build a mental model of Kubernetes, inspect its resources, and ship a small application on a local cluster. The slides use staged diagrams so each concept appears one piece at a time.</p>
       <nav aria-label="Workshop slide decks">
         <ol>
-          <li><a href="01-kubernetes-concepts/">Kubernetes concepts</a></li>
-          <li><a href="02-kubernetes-resources/">Kubernetes resources</a></li>
-          <li><a href="03-kubernetes-cli/">Kubernetes CLI</a></li>
-          <li><a href="04-kubernetes-deployments/">Kubernetes deployments</a></li>
+          <li><a href="01-kubernetes-concepts/"><span><strong>Kubernetes concepts</strong>Control loops, cluster architecture, scheduling, and container runtimes.</span></a></li>
+          <li><a href="02-kubernetes-resources/"><span><strong>Kubernetes resources</strong>Pods, controllers, Services, configuration, storage, and namespaces.</span></a></li>
+          <li><a href="03-kubernetes-cli/"><span><strong>kubectl and a local cluster</strong>Create a kind cluster, explore the API, and debug a workload.</span></a></li>
+          <li><a href="04-kubernetes-deployments/"><span><strong>Deploy an application</strong>Apply manifests, expose podinfo, scale it, and roll out an update.</span></a></li>
         </ol>
       </nav>
+      <footer>Press <strong>S</strong> in a deck for speaker view. Press <strong>Esc</strong> for the slide overview. Source on <a href="https://github.com/DemisR/workshop-kubernetes">GitHub</a>.</footer>
     </main>
   </body>
 </html>
